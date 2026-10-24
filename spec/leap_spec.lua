@@ -185,8 +185,8 @@ describe("leap", function()
           expectedyear, expectedmonth = expectedyear + 1, expectedmonth - 12
         end
         local yday = 0 -- day of year for the first day of the expected month
-        for previous = 1, expectedmonth - 1 do
-          yday = yday + daysinmonth(expectedyear, previous)
+        for previousmonth = 1, expectedmonth - 1 do
+          yday = yday + daysinmonth(expectedyear, previousmonth)
         end
         local mday = daysinmonth(expectedyear, expectedmonth)
         for _, day in ipairs({ -367, -31, -1, 0, 1, mday, mday + 1, 367 }) do
