@@ -145,9 +145,8 @@ function _M.absdate(day)
 end
 
 --- Absolute date from year, month, and day of month.
--- Returns the absolute date from the given year, month, and day of month.
--- The absolute date is calculated as the number of days since the epoch
--- (January 1, 1970).
+-- Returns the absolute date from the given year, month, and day of month. The
+-- absolute date is calculated as the number of days since January 1 of year 0.
 -- @param y The year.
 -- @param mon The month, starting from 1 for January.
 -- @param day The day of the month, starting from 1 for the first day of the month.
