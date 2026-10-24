@@ -1,5 +1,6 @@
 describe("recursing", function()
   local recursed = require "recursing"
+  local unpack = table.unpack or unpack
 
   it("copy by unpacking works", function()
     assert.same({ 1, 2, 3 }, { unpack { 1, 2, 3 } })
