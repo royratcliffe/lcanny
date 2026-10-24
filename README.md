@@ -9,9 +9,11 @@ serialisation, and string building.
 
 - `by`: group values by a key function.
 - `collecting`: collect iterator values or key-value pairs into tables.
+- `div`: calculate quotients and modulo values.
 - `indexing`: access values and create nested indices with defaults.
 - `interleaving`: iterate arrays as pairs of values.
 - `is`: check Lua identifiers and array tables.
+- `leap`: perform proleptic Gregorian calendar and leap-year calculations.
 - `patching`: diff tables and apply patches in place.
 - `recursing`: iterate table leaves and branches, or look up nested values.
 - `serialising`: serialise Lua values and tables as Lua source.
@@ -29,7 +31,7 @@ Each module is required by its name, for example `require("collecting")`.
 From the project root, run:
 
 ```sh
-luarocks make lcanny-0.1.0-1.rockspec
+luarocks make lcanny-0.2.0-1.rockspec
 ```
 
 ## Run the Busted specs
@@ -81,5 +83,5 @@ The generated site is written to `doc`.
 ## Publishing
 
 Before uploading a release, update the repository URL and homepage in the
-rockspec, commit and push the matching `v0.1.0` Git tag, and verify the package
-with `luarocks lint lcanny-0.1.0-1.rockspec`.
+rockspec, commit and push the matching `v0.2.0` Git tag, and verify the package
+with `luarocks lint lcanny-0.2.0-1.rockspec`.
