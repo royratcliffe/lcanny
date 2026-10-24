@@ -51,6 +51,23 @@ luacov
 
 The coverage workflow runs this on Lua 5.1 and 5.4 for pushes and pull requests.
 
+### Coverage in VS Code on Windows
+
+Install the recommended **Coverage Gutters** extension and the LCOV reporter:
+
+```sh
+luarocks install --local luacov-reporter-lcov
+```
+
+Run **Tasks: Run Task** from the Command Palette and select **Busted coverage**.
+The task configures the LuaRocks environment, clears previous coverage data,
+runs all specs, and writes source coverage to `lcov.info`.
+
+Then run **Coverage Gutters: Watch** from the Command Palette to display
+covered and uncovered lines in the editor gutter. Rerun the task after changes;
+the extension refreshes automatically. Generated coverage files are ignored
+by Git.
+
 ## Generate API documentation
 
 Install LDoc with `luarocks install ldoc`, then generate HTML documentation:
