@@ -1,8 +1,15 @@
---- Leap year calculations.
--- This module provides functions for determining leap years and performing
--- date calculations that account for leap years in the Gregorian calendar.
--- It includes functions to check if a year is a leap year, calculate the number
--- of leap days up to a given year, and convert between different date formats.
+--- Proleptic Gregorian calendar calculations.
+-- Years use astronomical numbering: year 0 exists, is a leap year, and is
+-- preceded by year -1. Calendar inputs are integers. Months and days of month
+-- are one-based; days of year are zero-based.
+--
+-- Absolute days count from January 1 of year 0, not the Unix epoch.
+-- January 1, 1970 is absolute day 719528. Calculations are independent of
+-- time zones and daylight saving time.
+--
+-- `MDAY` contains common-year month lengths, and `YDAY` contains the zero-based
+-- starting day of each common-year month. Both are indexed from 1 to 12.
+-- `MCM` is 693961, the absolute day of January 1, 1900.
 -- @module leap
 local _M = {
   MDAY = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 },
@@ -14,57 +21,50 @@ local div = require "div"
 --- Is a year a leap year?
 -- A year is a leap year if it is divisible by 4, except for years that
 -- are divisible by 100, unless they are also divisible by 400.
--- @param y The year to check.
+-- @tparam number y Integer year, including zero or negative years.
+-- @treturn boolean Whether the year is a leap year.
 function _M.year(y)
   return y % 4 == 0 and (y % 100 ~= 0 or y % 400 == 0)
 end
 
---- Adds one for a leap year otherwise zero.
--- Answers 1 if the year is a leap year, otherwise answers 0. This is
--- the same result as is_leap() except that the result is an explicit integer; 1
--- for leap years, 0 for non-leap years.
--- @param y The year to check.
--- @return 1 if the year is a leap year, otherwise 0.
+--- Returns the leap-day adjustment for a year.
+-- This is the numeric equivalent of @{year}.
+-- @tparam number y Integer year.
+-- @treturn number 1 for a leap year, otherwise 0.
 function _M.add(y)
   return _M.year(y) and 1 or 0
 end
 
---- Leaped days completed up to but not including the first day of the given year.
--- Counts the number of leap days that have occurred from year 0 up to but not
--- including the first day of the given year. This is calculated as the number
--- of years divisible by 4, minus those divisible by 100, plus those divisible
--- by 400. This accounts for the rules of leap years in the Gregorian calendar.
--- @param y The year to check.
--- @treturn number The number of leap days completed up to but not including the
--- first day of the given year.
+--- Counts leap years through the given year.
+-- Returns `floor(y / 4) - floor(y / 100) + floor(y / 400)`.
+-- For positive years, this counts leap years from 1 through `y`, inclusive.
+-- The formula extends to zero and negative years without counting year 0
+-- as an extra leap day: `thru(0)` is 0 and `thru(-1)` is -1.
+-- @tparam number y Integer year, included in the count.
+-- @treturn number Signed cumulative leap-year count.
 function _M.thru(y)
   return div.mod(y, 4) - div.mod(y, 100) + div.mod(y, 400)
 end
 
--- Counts the number of leaped days completed up to but not including the first
--- day of the given year.
+--- Returns the absolute day of January 1 of a year.
+-- Year 0 starts at absolute day 0; year 1 starts at absolute day 366.
+-- @tparam number y Integer year.
+-- @treturn number Days from January 1 of year 0 to January 1 of `y`.
 function _M.day(y)
   return y * 365 + _M.thru(y - 1) + 1
 end
 
---- Offsets year and day of year.
--- Year and day of year from year and day of year.
--- Adjust the day so that it sits in-between 0 and 365 or 366, inclusively.
---
--- The day is adjusted to be within the range of 0 to 365 (or
--- 366) inclusively, and the year is adjusted accordingly.
--- This function ensures that the day of the year does not exceed the number of
--- days in the year, accounting for leap years.
--- If the day is negative or exceeds the number of days in the year, it adjusts
--- the year and day accordingly.
--- The day is adjusted to be 0-based, meaning it starts from 0 for the
--- first day of the year.
--- The year is adjusted to account for the number of days in the year, which can
--- be either 365 or 366 depending on whether it is a leap year.
--- @param y The year.
--- @param day The day of the year, starting from 0.
--- @return The year adjusted to account for the number of days in the year.
--- @return The adjusted day of the year, starting from 0 for the first day.
+--- Normalises a year and zero-based day of year.
+-- Negative days move into earlier years; overflowing days move into later
+-- years. The resulting day is in 0..364 for a common year or 0..365 for a
+-- leap year.
+-- @tparam number y Integer starting year.
+-- @tparam number day Integer day offset from January 1 of `y`.
+-- @treturn number Normalised year.
+-- @treturn number Normalised zero-based day of year.
+-- @usage
+-- local leap = require "leap"
+-- local year, day = leap.off(2024, 366) -- 2025, 0
 function _M.off(y, day)
   local days = 365 + _M.add(y)
   while day < 0 or day >= days do
@@ -77,38 +77,31 @@ function _M.off(y, day)
   return y, day
 end
 
---- Day of month from year and month.
--- Returns the number of days in the month for the given year and month.
--- @param y The year.
--- @param mon The month, starting from 1 for January.
--- @return The number of days in the month, accounting for leap years in
--- February.
+--- Returns the number of days in a month.
+-- February has 29 days in leap years and 28 otherwise.
+-- @tparam number y Integer year.
+-- @tparam number mon Integer month in 1..12; not normalised.
+-- @treturn number Month length.
 function _M.mday(y, mon)
   return _M.MDAY[mon] + (mon == 2 and _M.add(y) or 0)
 end
 
---- Day of year from year and month.
--- Returns the day of the year for the given year and month.
--- The day of the year is calculated by summing the days in the months up to
--- the given month, and adding an extra day if the month is after February in a
--- leap year.
--- @param y The year.
--- @param mon The month, starting from 1 for January.
--- @return The day of the year, starting from 0 for first of January.
+--- Returns the zero-based day of year at the start of a month.
+-- Includes February's extra day for months after February in leap years.
+-- @tparam number y Integer year.
+-- @tparam number mon Integer month in 1..12; not normalised.
+-- @treturn number Day offset of the first day of the month.
 function _M.yday(y, mon)
   return _M.YDAY[mon] + (mon > 2 and _M.add(y) or 0)
 end
 
---- Date from year and day of year.
--- Adjust the day so that it sits in-between 1 and 365 (or 366) inclusively.
--- Returns the year, month, and day of the month for the given year and day of
--- year. The day of the month is adjusted to be 1-based, meaning it starts from 1
--- for the first day of the month.
--- @param y The year.
--- @param day The day of the year, starting from 0 for first of January.
--- @return The year.
--- @return The month, starting from 1 for January.
--- @return The day of the month, starting from 1 for the first day of the month.
+--- Converts a year and zero-based day of year to a calendar date.
+-- Normalises negative or overflowing days using @{off}.
+-- @tparam number y Integer starting year.
+-- @tparam number day Integer day offset from January 1 of `y`.
+-- @treturn number Normalised year.
+-- @treturn number Month in 1..12.
+-- @treturn number One-based day of month.
 function _M.date(y, day)
   y, day = _M.off(y, day)
   for mon = 1, 12 do
@@ -151,13 +144,16 @@ function _M.absdate(day)
   return _M.date(0, day)
 end
 
---- Absolute date from year, month, and day of month.
--- Returns the absolute date from the given year, month, and day of month. The
--- absolute date is calculated as the number of days since January 1 of year 0.
--- @param y The year.
--- @param mon The month, starting from 1 for January.
--- @param day The day of the month, starting from 1 for the first day of the month.
--- @return The absolute date as the number of days since the epoch.
+--- Converts a calendar date to an absolute day.
+-- Normalises months and days using @{from}. Inverse of @{absdate} for
+-- normalised dates. Absolute day 0 is January 1 of year 0.
+-- @tparam number y Integer year, using astronomical numbering (including year 0).
+-- @tparam number mon Integer one-based month; may be outside 1..12.
+-- @tparam number day Integer one-based day of month; may be outside the month.
+-- @treturn number Days since January 1 of year 0.
+-- @usage
+-- local leap = require "leap"
+-- local absolute = leap.absfrom(1970, 1, 1) -- 719528
 function _M.absfrom(y, mon, day)
   local y_, day_ = _M.from(y, mon, day)
   return _M.day(y_) + day_
