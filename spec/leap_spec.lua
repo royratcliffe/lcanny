@@ -1,5 +1,44 @@
 describe("leap", function()
   local leap = require "leap"
+  local monthdays = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+
+  local function isleap(year)
+    if year % 400 == 0 then return true end
+    if year % 100 == 0 then return false end
+    return year % 4 == 0
+  end
+
+  local function daysinmonth(year, month)
+    return monthdays[month] + (month == 2 and isleap(year) and 1 or 0)
+  end
+
+  local function daysinyear(year)
+    return isleap(year) and 366 or 365
+  end
+
+  local function normalise(year, day)
+    while day < 0 do
+      year = year - 1
+      day = day + daysinyear(year)
+    end
+    while day >= daysinyear(year) do
+      day = day - daysinyear(year)
+      year = year + 1
+    end
+    return year, day
+  end
+
+  local function assertpair(year, day, actualyear, actualday)
+    if year ~= actualyear or day ~= actualday then
+      assert.same({ year, day }, { actualyear, actualday })
+    end
+  end
+
+  local function assertdate(year, month, day, actualyear, actualmonth, actualday)
+    if year ~= actualyear or month ~= actualmonth or day ~= actualday then
+      assert.same({ year, month, day }, { actualyear, actualmonth, actualday })
+    end
+  end
 
   it("year", function()
     assert.truthy(leap.year(0))
@@ -62,5 +101,144 @@ describe("leap", function()
 
   it("absfrom", function()
     assert.equal(0, leap.absfrom(0, 1, 1))
+  end)
+
+  it("exports the common-year month lengths and offsets", function()
+    assert.same(monthdays, leap.MDAY)
+    local offset = 0
+    for month = 1, 12 do
+      assert.equal(offset, leap.YDAY[month])
+      offset = offset + monthdays[month]
+    end
+    assert.equal(693961, leap.MCM)
+  end)
+
+  it("classifies every year across negative and positive Gregorian cycles", function()
+    local leapdays = -195
+    local absolute = -292194
+    for year = -800, 2400 do
+      local expected = isleap(year)
+      assert.equal(expected, leap.year(year), "year " .. year)
+      assert.equal(expected and 1 or 0, leap.add(year), "add " .. year)
+      assert.equal(leapdays, leap.thru(year - 1), "thru " .. (year - 1))
+      assert.equal(absolute, leap.day(year), "day " .. year)
+      if expected then leapdays = leapdays + 1 end
+      assert.equal(leapdays, leap.thru(year), "thru " .. year)
+      absolute = absolute + daysinyear(year)
+    end
+  end)
+
+  it("converts every day of a complete 400-year Gregorian cycle", function()
+    local absolute = 0
+    for year = 0, 399 do
+      local ordinal = 0
+      for month = 1, 12 do
+        local length = daysinmonth(year, month)
+        assert.equal(length, leap.mday(year, month))
+        assert.equal(ordinal, leap.yday(year, month))
+        for day = 1, length do
+          assertdate(year, month, day, leap.date(year, ordinal))
+          assertpair(year, ordinal, leap.from(year, month, day))
+          assertpair(year, ordinal, leap.off(0, absolute))
+          assertdate(year, month, day, leap.absdate(absolute))
+          local actualabsolute = leap.absfrom(year, month, day)
+          if absolute ~= actualabsolute then
+            assert.equal(absolute, actualabsolute)
+          end
+          ordinal = ordinal + 1
+          absolute = absolute + 1
+        end
+      end
+      assert.equal(daysinyear(year), ordinal)
+    end
+    assert.equal(146097, absolute)
+  end)
+
+  it("converts every negative-year month boundary across a Gregorian cycle", function()
+    local absolute = -146097
+    for year = -400, -1 do
+      local ordinal = 0
+      for month = 1, 12 do
+        local length = daysinmonth(year, month)
+        assert.equal(length, leap.mday(year, month))
+        assert.equal(ordinal, leap.yday(year, month))
+        for _, day in ipairs({ 1, length }) do
+          local offset = day - 1
+          assert.same({ year, month, day }, { leap.date(year, ordinal + offset) })
+          assert.same({ year, ordinal + offset }, { leap.from(year, month, day) })
+          assert.same({ year, month, day }, { leap.absdate(absolute + offset) })
+          assert.equal(absolute + offset, leap.absfrom(year, month, day))
+        end
+        ordinal = ordinal + length
+        absolute = absolute + length
+      end
+    end
+    assert.equal(0, absolute)
+  end)
+
+  it("normalises day offsets around every year boundary in two cycles", function()
+    for year = -400, 399 do
+      local length = daysinyear(year)
+      local offsets = {
+        -146098, -146097, -146096, -1000, -367, -366, -365, -1,
+        0, 1, length - 1, length, length + 1,
+        1000, 146096, 146097, 146098,
+      }
+      for _, day in ipairs(offsets) do
+        assert.same({ normalise(year, day) }, { leap.off(year, day) },
+          "year " .. year .. ", offset " .. day)
+      end
+    end
+  end)
+
+  it("normalises overflowing months and days across century boundaries", function()
+    for _, year in ipairs({ -400, -100, -1, 0, 1, 4, 100, 400, 1900, 2000, 2100 }) do
+      for month = -24, 36 do
+        local expectedyear, expectedmonth = year, month
+        while expectedmonth < 1 do
+          expectedyear = expectedyear - 1
+          expectedmonth = expectedmonth + 12
+        end
+        while expectedmonth > 12 do
+          expectedyear = expectedyear + 1
+          expectedmonth = expectedmonth - 12
+        end
+        local ordinal = 0
+        for previous = 1, expectedmonth - 1 do
+          ordinal = ordinal + daysinmonth(expectedyear, previous)
+        end
+        local length = daysinmonth(expectedyear, expectedmonth)
+        for _, day in ipairs({ -367, -31, -1, 0, 1, length, length + 1, 367 }) do
+          local y, d = normalise(expectedyear, ordinal + day - 1)
+          assert.same({ y, d }, { leap.from(year, month, day) },
+            "year " .. year .. ", month " .. month .. ", day " .. day)
+          local mon = 1
+          while d >= daysinmonth(y, mon) do
+            d = d - daysinmonth(y, mon)
+            mon = mon + 1
+          end
+          assert.same({ y, mon, d + 1 }, { leap.date(leap.from(year, month, day)) })
+        end
+      end
+    end
+  end)
+
+  it("anchors absolute dates at year zero rather than the Unix epoch", function()
+    local cases = {
+      { -400, 1,  1,  -146097 },
+      { -1,   12, 31, -1 },
+      { 0,    1,  1,  0 },
+      { 0,    2,  29, 59 },
+      { 1,    1,  1,  366 },
+      { 400,  1,  1,  146097 },
+      { 1900, 1,  1,  693961 },
+      { 1970, 1,  1,  719528 },
+      { 2000, 1,  1,  730485 },
+    }
+    for _, case in ipairs(cases) do
+      local year, month, day, absolute = case[1], case[2], case[3], case[4]
+      assert.equal(absolute, leap.absfrom(year, month, day))
+      assert.same({ year, month, day }, { leap.absdate(absolute) })
+    end
   end)
 end)
