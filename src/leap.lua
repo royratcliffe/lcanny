@@ -118,16 +118,18 @@ function _M.date(y, day)
   end
 end
 
---- Day from year, month and day of month.
--- Adjust the month so that it sits in-between 1 and 12 inclusively. The month
--- offsets the year.
--- Returns the absolute date from the given year, month, and day of month.
--- The absolute date is calculated as the number of days since the epoch
--- (January 1, 1970).
--- @param y The year.
--- @param mon The month, starting from 1 for January.
--- @param day The day of the month, starting from 1 for the first day of the month.
--- @return The absolute date as the number of days since the epoch.
+--- Converts a calendar date to a year and zero-based day of year.
+-- Normalises the month first, then the day using @{off}. Month 0 means
+-- December of the previous year; day 0 means the last day of the preceding
+-- month. Returns a year and day of year, not an absolute day count.
+-- @tparam number y Integer year, using astronomical numbering (including year 0).
+-- @tparam number mon Integer one-based month; may be outside 1..12.
+-- @tparam number day Integer one-based day of month; may be outside the month.
+-- @treturn number Normalised year.
+-- @treturn number Zero-based day of year, in 0..364 or 0..365 for a leap year.
+-- @usage
+-- local leap = require "leap"
+-- local year, day = leap.from(2024, 3, 0) -- 2024, 59 (February 29)
 function _M.from(y, mon, day)
   local y_, mon_ = div.mod(mon - 1, 12)
   y = y + y_
