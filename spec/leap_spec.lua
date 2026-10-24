@@ -119,22 +119,21 @@ describe("leap", function()
   it("converts every day of a complete 400-year Gregorian cycle", function()
     local absolute = 0
     for year = 0, 399 do
-      local ordinal = 0
+      local yday = 0
       for month = 1, 12 do
-        local days = daysinmonth(year, month)
-        assert.equal(days, leap.mday(year, month))
-        assert.equal(ordinal, leap.yday(year, month))
-        for day = 1, days do
-          assert.same({ year, month, day }, { leap.date(year, ordinal) })
-          assert.same({ year, ordinal }, { leap.from(year, month, day) })
-          assert.same({ year, ordinal }, { leap.off(0, absolute) })
+        local mday = daysinmonth(year, month)
+        assert.equal(mday, leap.mday(year, month))
+        assert.equal(yday, leap.yday(year, month))
+        for day = 1, mday do
+          assert.same({ year, month, day }, { leap.date(year, yday) })
+          assert.same({ year, yday }, { leap.from(year, month, day) })
+          assert.same({ year, yday }, { leap.off(0, absolute) })
           assert.same({ year, month, day }, { leap.absdate(absolute) })
           assert.equal(absolute, leap.absfrom(year, month, day))
-          ordinal = ordinal + 1
-          absolute = absolute + 1
+          yday, absolute = yday + 1, absolute + 1
         end
       end
-      assert.equal(daysinyear(year), ordinal)
+      assert.equal(daysinyear(year), yday)
     end
     assert.equal(146097, absolute)
   end)
@@ -142,20 +141,19 @@ describe("leap", function()
   it("converts every negative-year month boundary across a Gregorian cycle", function()
     local absolute = -146097
     for year = -400, -1 do
-      local ordinal = 0
+      local yday = 0
       for month = 1, 12 do
-        local days = daysinmonth(year, month)
-        assert.equal(days, leap.mday(year, month))
-        assert.equal(ordinal, leap.yday(year, month))
-        for _, day in ipairs({ 1, days }) do
+        local mday = daysinmonth(year, month)
+        assert.equal(mday, leap.mday(year, month))
+        assert.equal(yday, leap.yday(year, month))
+        for _, day in ipairs({ 1, mday }) do
           local offset = day - 1
-          assert.same({ year, month, day }, { leap.date(year, ordinal + offset) })
-          assert.same({ year, ordinal + offset }, { leap.from(year, month, day) })
+          assert.same({ year, month, day }, { leap.date(year, yday + offset) })
+          assert.same({ year, yday + offset }, { leap.from(year, month, day) })
           assert.same({ year, month, day }, { leap.absdate(absolute + offset) })
           assert.equal(absolute + offset, leap.absfrom(year, month, day))
         end
-        ordinal = ordinal + days
-        absolute = absolute + days
+        yday, absolute = yday + mday, absolute + mday
       end
     end
     assert.equal(0, absolute)
@@ -181,26 +179,23 @@ describe("leap", function()
       for month = -24, 36 do
         local expectedyear, expectedmonth = year, month
         while expectedmonth < 1 do
-          expectedyear = expectedyear - 1
-          expectedmonth = expectedmonth + 12
+          expectedyear, expectedmonth = expectedyear - 1, expectedmonth + 12
         end
         while expectedmonth > 12 do
-          expectedyear = expectedyear + 1
-          expectedmonth = expectedmonth - 12
+          expectedyear, expectedmonth = expectedyear + 1, expectedmonth - 12
         end
-        local ordinal = 0
+        local yday = 0 -- day of year for the first day of the expected month
         for previous = 1, expectedmonth - 1 do
-          ordinal = ordinal + daysinmonth(expectedyear, previous)
+          yday = yday + daysinmonth(expectedyear, previous)
         end
-        local days = daysinmonth(expectedyear, expectedmonth)
-        for _, day in ipairs({ -367, -31, -1, 0, 1, days, days + 1, 367 }) do
-          local y, d = normalise(expectedyear, ordinal + day - 1)
+        local mday = daysinmonth(expectedyear, expectedmonth)
+        for _, day in ipairs({ -367, -31, -1, 0, 1, mday, mday + 1, 367 }) do
+          local y, d = normalise(expectedyear, yday + day - 1)
           assert.same({ y, d }, { leap.from(year, month, day) },
             "year " .. year .. ", month " .. month .. ", day " .. day)
           local mon = 1
           while d >= daysinmonth(y, mon) do
-            d = d - daysinmonth(y, mon)
-            mon = mon + 1
+            d, mon = d - daysinmonth(y, mon), mon + 1
           end
           assert.same({ y, mon, d + 1 }, { leap.date(leap.from(year, month, day)) })
         end
