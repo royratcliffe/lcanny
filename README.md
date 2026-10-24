@@ -1,5 +1,7 @@
 # lcanny
 
+[![codecov](https://codecov.io/gh/royratcliffe/lcanny/branch/master/graph/badge.svg)](https://codecov.io/gh/royratcliffe/lcanny)
+
 A collection of Lua utility modules for table operations, iteration,
 serialisation, and string building.
 
