@@ -1,0 +1,21 @@
+describe("is", function()
+  local is = require "is"
+
+  it("recognises valid and invalid identifiers", function()
+    assert.is_true(is.identifier("name"))
+    assert.is_true(is.identifier("_name123"))
+    assert.is_false(is.identifier(""))
+    assert.is_false(is.identifier("1name"))
+    assert.is_false(is.identifier("not-name"))
+  end)
+
+  it("recognises arrays and rejects sparse or keyed tables", function()
+    assert.truthy(is.array {})
+    assert.truthy(is.array { 1, 2, 3 })
+    assert.falsy(is.array { 1, nil, 3 })
+    assert.falsy(is.array { [2] = "second" })
+    assert.falsy(is.array { first = "value" })
+    assert.equal(3, # { 1, nil, 3 })
+    assert.equal(2, # { 1, second = nil, 3 })
+  end)
+end)
