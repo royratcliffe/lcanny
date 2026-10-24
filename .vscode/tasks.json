@@ -1,0 +1,20 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Busted coverage",
+            "type": "process",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-Command",
+                "$ErrorActionPreference = 'Stop'; $env:Path = \"$(luarocks path --lr-bin);$env:Path\"; $env:LUA_PATH = \"src\\?.lua;$(luarocks path --lr-path)\"; $env:LUA_CPATH = luarocks path --lr-cpath; foreach ($file in 'luacov.stats.out', 'lcov.info') { if (Test-Path $file) { Remove-Item $file } }; busted --coverage; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; luacov -r lcov src; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; Move-Item -Force luacov.report.out lcov.info"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "problemMatcher": []
+        }
+    ]
+}

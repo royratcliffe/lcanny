@@ -1,2 +1,5 @@
 *.rock
 *.src.rock
+luacov.stats.out
+luacov.report.out
+lcov.info
