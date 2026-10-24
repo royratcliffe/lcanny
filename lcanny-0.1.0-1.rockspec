@@ -1,3 +1,5 @@
+---@diagnostic disable: lowercase-global
+
 package = "lcanny"
 version = "0.1.0-1"
 source = {
