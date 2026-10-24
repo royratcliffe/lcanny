@@ -121,10 +121,10 @@ describe("leap", function()
     for year = 0, 399 do
       local ordinal = 0
       for month = 1, 12 do
-        local length = daysinmonth(year, month)
-        assert.equal(length, leap.mday(year, month))
+        local days = daysinmonth(year, month)
+        assert.equal(days, leap.mday(year, month))
         assert.equal(ordinal, leap.yday(year, month))
-        for day = 1, length do
+        for day = 1, days do
           assert.same({ year, month, day }, { leap.date(year, ordinal) })
           assert.same({ year, ordinal }, { leap.from(year, month, day) })
           assert.same({ year, ordinal }, { leap.off(0, absolute) })
@@ -144,18 +144,18 @@ describe("leap", function()
     for year = -400, -1 do
       local ordinal = 0
       for month = 1, 12 do
-        local length = daysinmonth(year, month)
-        assert.equal(length, leap.mday(year, month))
+        local days = daysinmonth(year, month)
+        assert.equal(days, leap.mday(year, month))
         assert.equal(ordinal, leap.yday(year, month))
-        for _, day in ipairs({ 1, length }) do
+        for _, day in ipairs({ 1, days }) do
           local offset = day - 1
           assert.same({ year, month, day }, { leap.date(year, ordinal + offset) })
           assert.same({ year, ordinal + offset }, { leap.from(year, month, day) })
           assert.same({ year, month, day }, { leap.absdate(absolute + offset) })
           assert.equal(absolute + offset, leap.absfrom(year, month, day))
         end
-        ordinal = ordinal + length
-        absolute = absolute + length
+        ordinal = ordinal + days
+        absolute = absolute + days
       end
     end
     assert.equal(0, absolute)
@@ -163,10 +163,10 @@ describe("leap", function()
 
   it("normalises day offsets around every year boundary in two cycles", function()
     for year = -400, 399 do
-      local length = daysinyear(year)
+      local days = daysinyear(year)
       local offsets = {
         -146098, -146097, -146096, -1000, -367, -366, -365, -1,
-        0, 1, length - 1, length, length + 1,
+        0, 1, days - 1, days, days + 1,
         1000, 146096, 146097, 146098,
       }
       for _, day in ipairs(offsets) do
@@ -192,8 +192,8 @@ describe("leap", function()
         for previous = 1, expectedmonth - 1 do
           ordinal = ordinal + daysinmonth(expectedyear, previous)
         end
-        local length = daysinmonth(expectedyear, expectedmonth)
-        for _, day in ipairs({ -367, -31, -1, 0, 1, length, length + 1, 367 }) do
+        local days = daysinmonth(expectedyear, expectedmonth)
+        for _, day in ipairs({ -367, -31, -1, 0, 1, days, days + 1, 367 }) do
           local y, d = normalise(expectedyear, ordinal + day - 1)
           assert.same({ y, d }, { leap.from(year, month, day) },
             "year " .. year .. ", month " .. month .. ", day " .. day)
