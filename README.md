@@ -48,8 +48,6 @@ ldoc --fatalwarnings --testing -c config.ld src
 ```
 
 The generated site is written to `doc`.
-To generate the PDF API reference as well, run `python tools/build_pdf.py`
-from the project root. This requires Microsoft Edge.
 
 ## Publishing
 
