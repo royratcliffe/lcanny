@@ -28,18 +28,6 @@ describe("leap", function()
     return year, day
   end
 
-  local function assertpair(year, day, actualyear, actualday)
-    if year ~= actualyear or day ~= actualday then
-      assert.same({ year, day }, { actualyear, actualday })
-    end
-  end
-
-  local function assertdate(year, month, day, actualyear, actualmonth, actualday)
-    if year ~= actualyear or month ~= actualmonth or day ~= actualday then
-      assert.same({ year, month, day }, { actualyear, actualmonth, actualday })
-    end
-  end
-
   it("year", function()
     assert.truthy(leap.year(0))
   end)
@@ -137,14 +125,11 @@ describe("leap", function()
         assert.equal(length, leap.mday(year, month))
         assert.equal(ordinal, leap.yday(year, month))
         for day = 1, length do
-          assertdate(year, month, day, leap.date(year, ordinal))
-          assertpair(year, ordinal, leap.from(year, month, day))
-          assertpair(year, ordinal, leap.off(0, absolute))
-          assertdate(year, month, day, leap.absdate(absolute))
-          local actualabsolute = leap.absfrom(year, month, day)
-          if absolute ~= actualabsolute then
-            assert.equal(absolute, actualabsolute)
-          end
+          assert.same({ year, month, day }, { leap.date(year, ordinal) })
+          assert.same({ year, ordinal }, { leap.from(year, month, day) })
+          assert.same({ year, ordinal }, { leap.off(0, absolute) })
+          assert.same({ year, month, day }, { leap.absdate(absolute) })
+          assert.equal(absolute, leap.absfrom(year, month, day))
           ordinal = ordinal + 1
           absolute = absolute + 1
         end
