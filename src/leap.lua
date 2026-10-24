@@ -134,12 +134,17 @@ function _M.from(y, mon, day)
   return _M.off(y, _M.yday(y, mon_ + 1) + day - 1)
 end
 
---- Absolute date from day of year.
--- Returns the absolute date from the given day of year, starting from 0 for the
--- first day of the year. The absolute date is calculated as the number of days
--- since the epoch (January 1, 1970).
--- @param day The day of the year, starting from 0 for the first day of the year.
--- @return The absolute date as the number of days since the epoch.
+--- Converts an absolute day to a calendar date.
+-- Absolute day 0 is January 1 of year 0, not January 1, 1970.
+-- Negative days refer to dates before year 0. Inverse of @{absfrom} for
+-- normalised dates.
+-- @tparam number day Integer days since January 1 of year 0.
+-- @treturn number Year, using astronomical numbering (including year 0).
+-- @treturn number Month in 1..12.
+-- @treturn number One-based day of month.
+-- @usage
+-- local leap = require "leap"
+-- local year, month, day = leap.absdate(719528) -- 1970, 1, 1
 function _M.absdate(day)
   return _M.date(0, day)
 end
