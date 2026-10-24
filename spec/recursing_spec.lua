@@ -7,16 +7,22 @@ describe("recursing", function()
   end)
 
   it("works", function()
-    local recursing = recursed.leavesandbranches {
+    local root = {
       a = {
         b = {},
         c = 123
       }
     }
-    assert.same({ "a" }, recursing())
-    assert.same({ { "a", "c" }, 123, "number" }, { recursing() })
-    assert.same({ "a", "b" }, recursing())
-    assert.is_nil(recursing())
+    local results = {}
+    for indices, value, kind in recursed.leavesandbranches(root) do
+      results[table.concat(indices, ".")] = { value = value, kind = kind }
+    end
+
+    assert.same({
+      a = { value = root.a, kind = "table" },
+      ["a.b"] = { value = root.a.b, kind = "table" },
+      ["a.c"] = { value = 123, kind = "number" }
+    }, results)
   end)
 
   it("leavesandbranches", function()
