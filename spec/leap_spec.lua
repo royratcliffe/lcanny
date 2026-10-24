@@ -161,15 +161,15 @@ describe("leap", function()
 
   it("normalises day offsets around every year boundary in two cycles", function()
     for year = -400, 399 do
-      local days = daysinyear(year)
+      local yday = daysinyear(year)
       local offsets = {
         -146098, -146097, -146096, -1000, -367, -366, -365, -1,
-        0, 1, days - 1, days, days + 1,
+        0, 1, yday - 1, yday, yday + 1,
         1000, 146096, 146097, 146098,
       }
-      for _, day in ipairs(offsets) do
-        assert.same({ normalise(year, day) }, { leap.off(year, day) },
-          "year " .. year .. ", offset " .. day)
+      for _, offset in ipairs(offsets) do
+        assert.same({ normalise(year, offset) }, { leap.off(year, offset) },
+          "year " .. year .. ", offset " .. offset)
       end
     end
   end)
