@@ -1,5 +1,5 @@
 describe("recursing", function()
-  local recursed = require "recursing"
+  local recursing = require "recursing"
   local unpack = table.unpack or unpack
 
   it("copy by unpacking works", function()
@@ -14,7 +14,7 @@ describe("recursing", function()
       }
     }
     local results = {}
-    for indices, value, kind in recursed.leavesandbranches(root) do
+    for indices, value, kind in recursing.leavesandbranches(root) do
       results[table.concat(indices, ".")] = { value = value, kind = kind }
     end
 
@@ -29,7 +29,7 @@ describe("recursing", function()
     local results = {}
     local t = { s = "" }
     t.t = t
-    for subindices, value in recursed.leavesandbranches { a = 1, t = t } do
+    for subindices, value in recursing.leavesandbranches { a = 1, t = t } do
       if type(value) ~= "table" then
         table.insert(results, { subindices, value })
       end
@@ -43,7 +43,7 @@ describe("recursing", function()
   end)
 
   it("leaves", function()
-    local recursing = recursed.leaves {
+    local recursing = recursing.leaves {
       x = {
         y = 123
       }
@@ -54,7 +54,7 @@ describe("recursing", function()
 
   it("iterates branches only", function()
     local branches = {}
-    for indices, value in recursed.branches({ a = { b = {} }, c = 1 }) do
+    for indices, value in recursing.branches({ a = { b = {} }, c = 1 }) do
       table.insert(branches, { indices, value })
     end
 
@@ -73,7 +73,7 @@ describe("recursing", function()
 
   it("looks up a value by sub-indices", function()
     local root = { a = { b = 42 } }
-    local parent, index, value = recursed.sub(root, "a", "b")
+    local parent, index, value = recursing.sub(root, "a", "b")
 
     assert.equal(root.a, parent)
     assert.equal("b", index)
@@ -82,7 +82,7 @@ describe("recursing", function()
 
   it("returns the root when no sub-indices are provided", function()
     local root = {}
-    local parent, index, value = recursed.sub(root)
+    local parent, index, value = recursing.sub(root)
 
     assert.is_nil(parent)
     assert.is_nil(index)
@@ -90,12 +90,12 @@ describe("recursing", function()
   end)
 
   it("stops looking up when an intermediate value is not a table", function()
-    assert.is_nil(recursed.sub({ a = 1 }, "a", "b"))
+    assert.is_nil(recursing.sub({ a = 1 }, "a", "b"))
   end)
 
   it("rejects non-table roots when iterating", function()
     assert.has_error(function()
-      recursed.leavesandbranches("not a table")
+      recursing.leavesandbranches("not a table")
     end)
   end)
 end)
