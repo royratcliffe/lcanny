@@ -39,6 +39,16 @@ project root:
 busted
 ```
 
+To collect a LuaCov coverage report, install LuaCov with
+`luarocks install luacov` and run:
+
+```sh
+busted --coverage
+luacov
+```
+
+The coverage workflow runs this on Lua 5.1 and 5.4 for pushes and pull requests.
+
 ## Generate API documentation
 
 Install LDoc with `luarocks install ldoc`, then generate HTML documentation:
