@@ -9,6 +9,7 @@ local hi = require "hi"
 local so = require "so"
 local interleaving = require "interleaving"
 local collecting = require "collecting"
+local unpack = table.unpack or unpack
 
 --- Builds a Redis calling function.
 -- Builds a Redis calling function using the given sending and receiving
