@@ -8,16 +8,24 @@ serialisation, and string building.
 ## Modules
 
 - `by`: group values by a key function.
+- `co`: run coroutine lists with configurable error logging.
 - `collecting`: collect iterator values or key-value pairs into tables.
 - `div`: calculate quotients and modulo values.
+- `filename`: read and write files with automatic closure.
+- `filtering`: collect pairs that satisfy a filter.
+- `hi`: build half-duplex calling functions.
 - `indexing`: access values and create nested indices with defaults.
 - `interleaving`: iterate arrays as pairs of values.
 - `is`: check Lua identifiers and array tables.
 - `leap`: perform proleptic Gregorian calendar and leap-year calculations.
 - `patching`: diff tables and apply patches in place.
 - `recursing`: iterate table leaves and branches, or look up nested values.
+- `redis`: connect to Redis using RESP version 2.
+- `resp`: send and receive RESP version-2 messages and iterate Redis results.
 - `serialising`: serialise Lua values and tables as Lua source.
+- `so`: wrap socket operations with timeout callbacks.
 - `strbuf`: build strings using a callable buffer.
+- `uu`: generate time-, random-, and sequence-based identifiers.
 
 Each module is required by its name, for example `require("collecting")`.
 
@@ -40,6 +48,10 @@ existing ones. Logger failures propagate to the caller.
 
 - Lua 5.1 or newer
 - [LuaRocks](https://luarocks.org/)
+- [LuaSocket](https://lunarmodules.github.io/luasocket/) (installed by LuaRocks)
+
+Loading `redis` opens a connection to `REDISCLI_HOST` (default: `localhost`)
+on port 6379 and requires a running Redis server.
 
 ## Build and install locally
 
