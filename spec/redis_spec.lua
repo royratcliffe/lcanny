@@ -6,18 +6,18 @@ describe("redis", function()
 
     package.loaded["socket.core"] = socket
     package.loaded.redis = nil
-    os.getenv = function(name)
+    rawset(os, "getenv", function(name)
       if name == "REDISCLI_HOST" then
         return host
       end
       return original_getenv(name)
-    end
+    end)
 
     local ok, result = pcall(require, "redis")
 
     package.loaded["socket.core"] = original_socket
     package.loaded.redis = original_redis
-    os.getenv = original_getenv
+    rawset(os, "getenv", original_getenv)
 
     return ok, result
   end
