@@ -8,8 +8,6 @@
         "${3rd}/luassert/library"
     ],
     "Lua.diagnostics.globals": [
-        "describe",
-        "it",
         "unpack"
     ]
 }
