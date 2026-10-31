@@ -1,17 +1,19 @@
 --- Operates on filenames by file mode.
--- Temporarily opens files for reading or writing. Automatically closes
--- temporarily-opened files even on error.
+-- Temporarily opens files for reading or writing. Always attempts to close
+-- temporarily-opened files, then rethrows read or write errors unchanged.
 -- @module filename
 local _M = {}
 
---- Closes a file and returns additional values.
+---- Closes a file after a protected operation.
 -- @tparam file file The file to close.
--- @param ... Values to return after successfully closing the file.
--- @treturn boolean Whether the file was closed successfully.
--- @treturn string Error message if the file could not be closed.
--- @return ... Additional values passed in if closing succeeded.
-local function close(file, ...)
-  local closed, err = file:close()
+-- @tparam boolean ok Whether the operation succeeded.
+-- @param ... Operation results or the error to rethrow.
+-- @return ... Operation results, or nil and a close error.
+local function close(file, ok, ...)
+  local closeok, closed, err = pcall(file.close, file)
+  -- Preserve the operation error even if closing also fails.
+  if not ok then error((...), 0) end
+  if not closeok then error(closed, 0) end
   if not closed then return closed, err end
   return ...
 end
@@ -29,13 +31,18 @@ function _M.read(mode)
 end
 
 --- Performs a read.
+-- Step 1: Open the file for reading with the specified mode. If opening fails,
+-- return the error immediately.
+-- Step 2: Read from the file using the specified arguments. The read operation
+-- is protected with pcall to catch any errors. The file is closed afterwards,
+-- and any error propagates correctly.
 -- @tparam string filename Name of file to read.
 -- @param ... What to read.
 -- @return ... Read values.
 function __read:__call(filename, ...)
   local file, err = io.open(filename, "r" .. self.mode)
   if not file then return file, err end
-  return close(file, file:read(...))
+  return close(file, pcall(file.read, file, ...))
 end
 
 --- Metatable for write operations.
@@ -57,7 +64,7 @@ end
 function __write:__call(filename, ...)
   local file, err = io.open(filename, "w" .. self.mode)
   if not file then return file, err end
-  return close(file, file:write(...))
+  return close(file, pcall(file.write, file, ...))
 end
 
 return _M
