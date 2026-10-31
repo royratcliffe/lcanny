@@ -1,4 +1,12 @@
 describe("redis", function()
+  --- Loads the Redis module with a mock socket and optional host.
+  -- Restores the original socket module, Redis module, and environment lookup
+  -- after loading.
+  -- @tparam table socket Mock `socket.core` module.
+  -- @tparam[opt] string host Redis host to expose through `REDISCLI_HOST`.
+  -- @treturn boolean Whether loading the Redis module succeeded.
+  -- @treturn[1] Redis client on success.
+  -- @treturn[2] string Load error on failure.
   local function load_with_socket(socket, host)
     local original_socket = package.loaded["socket.core"]
     local original_redis = package.loaded.redis
