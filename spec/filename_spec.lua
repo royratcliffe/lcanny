@@ -1,3 +1,4 @@
+---@diagnostic disable: duplicate-set-field -- Tests replace io.open with file doubles.
 describe("filename", function()
   local filename = require "filename"
   local saved_open

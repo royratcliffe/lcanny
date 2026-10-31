@@ -1,3 +1,4 @@
+---@diagnostic disable: duplicate-set-field -- Tests replace the logging callback.
 require "busted.runner" {}
 
 describe("co", function()
