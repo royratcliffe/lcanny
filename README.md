@@ -52,6 +52,7 @@ luacov
 ```
 
 The coverage workflow runs this on Lua 5.1 and 5.4 for pushes and pull requests.
+Codecov excludes the `spec/` directory from coverage metrics.
 
 ### Coverage in VS Code on Windows
 
