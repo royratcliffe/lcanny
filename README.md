@@ -21,6 +21,21 @@ serialisation, and string building.
 
 Each module is required by its name, for example `require("collecting")`.
 
+### Coroutine error logging
+
+The `co` module reports coroutine errors through `co.log(message)`, which
+writes to stderr by default. Replace the callback to use an application logger:
+
+```lua
+local co = require "co"
+co.log = function(message)
+  log.write("on", log.ERROR, message)
+end
+```
+
+The callback receives a string and applies to all coroutine lists, including
+existing ones. Logger failures propagate to the caller.
+
 ## Requirements
 
 - Lua 5.1 or newer

@@ -6,6 +6,13 @@
 -- @module co
 local _M = {}
 
+--- Logs a coroutine error.
+-- Replace this function to route errors to an application logger.
+-- @tparam string message Error message.
+function _M.log(message)
+  assert(io.stderr:write(message, "\n"))
+end
+
 --- Coroutine module metatable.
 -- @field __call Allows you to call the module to create a new thread list.
 local __M = {}
@@ -32,7 +39,7 @@ function __threads:__call(...)
     if status then
       table.insert(self, thread)
     elseif result then
-      log.write("on", log.ERROR, string.format("%s", result))
+      _M.log(tostring(result))
     end
   end
   -- Step 2: Resume all coroutines that have been added to the list. Collect the
@@ -45,7 +52,7 @@ function __threads:__call(...)
     else
       local status, result = coroutine.resume(value)
       if not status and result then
-        log.write("on", log.ERROR, string.format("%s", result))
+        _M.log(tostring(result))
       end
     end
   end
