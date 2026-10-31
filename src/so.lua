@@ -54,7 +54,7 @@ function _M.recving(so, to)
       to()
       data, err, partial = so:receive(pattern, partial)
     end
-    return data, err
+    return data, err, partial
   end
 end
 
