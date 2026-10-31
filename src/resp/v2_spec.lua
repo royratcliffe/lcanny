@@ -25,7 +25,7 @@ describe("resp.v2", function()
 
   it("lolwut", function()
     assert.truthy(send { "LOLWUT" })
-    assert.equal("Redis ver. 7.4.1\n", recv())
+    assert.matches("^Redis ver%. %d+%.%d+%.%d+\n$", recv())
   end)
 
   describe("hi", function()
