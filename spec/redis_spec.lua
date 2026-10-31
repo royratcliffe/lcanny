@@ -23,9 +23,10 @@ describe("redis", function()
 
     local ok, result = pcall(require, "redis")
 
-    package.loaded["socket.core"] = original_socket
-    package.loaded.redis = original_redis
+    -- Unwind the fakery.
     rawset(os, "getenv", original_getenv)
+    package.loaded.redis = original_redis
+    package.loaded["socket.core"] = original_socket
 
     return ok, result
   end
