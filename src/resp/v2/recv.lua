@@ -37,18 +37,38 @@ function _M.recursive(recving)
   return assert(_M[data:sub(1, 1)])(recving, data:sub(2))
 end
 
+--- Receives a RESP version-2 number.
+-- @tparam func recving Function for abstractly receiving; unused for this reply.
+-- @tparam string rest Text after the colon prefix.
+-- @treturn number Received number.
 _M[":"] = function(_, rest)
   return assert(tonumber(rest))
 end
 
+--- Receives a RESP version-2 simple error.
+-- Returns the error message as the second result rather than raising an error.
+-- @tparam func recving Function for abstractly receiving; unused for this reply.
+-- @tparam string rest Error message after the prefix.
+-- @treturn nil No reply value.
+-- @treturn string Error message.
 _M["-"] = function(_, rest)
   return nil, rest
 end
 
+--- Receives a RESP version-2 simple string.
+-- @tparam func recving Function for abstractly receiving; unused for this reply.
+-- @tparam string rest Text after the plus prefix.
+-- @treturn string Received string.
 _M["+"] = function(_, rest)
   return rest
 end
 
+--- Receives a RESP version-2 bulk string.
+-- Receives the number of bytes specified by the length prefix, followed by a
+-- line ending. A negative length represents RESP null.
+-- @tparam func recving Function for abstractly receiving.
+-- @tparam string rest Text after the dollar prefix.
+-- @treturn any Received string, or RESP null.
 _M["$"] = function(recving, rest)
   local len = assert(tonumber(rest))
   if len < 0 then return resp.null end
