@@ -1,10 +1,10 @@
 ---@diagnostic disable: lowercase-global
 
 package = "lcanny"
-version = "0.2.0-1"
+version = "0.3.0-1"
 source = {
    url = "git+https://github.com/royratcliffe/lcanny.git",
-   tag = "v0.2.0",
+   tag = "v0.3.0",
 }
 description = {
    summary = "Lua utility modules for tables, iteration, and serialisation",

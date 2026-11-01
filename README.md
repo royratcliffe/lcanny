@@ -58,7 +58,7 @@ on port 6379 and requires a running Redis server.
 From the project root, run:
 
 ```sh
-luarocks make lcanny-0.2.0-1.rockspec
+luarocks make lcanny-0.3.0-1.rockspec
 ```
 
 ## Run the Busted specs
@@ -111,5 +111,5 @@ The generated site is written to `doc`.
 ## Publishing
 
 Before uploading a release, update the repository URL and homepage in the
-rockspec, commit and push the matching `v0.2.0` Git tag, and verify the package
-with `luarocks lint lcanny-0.2.0-1.rockspec`.
+rockspec, commit and push the matching `v0.3.0` Git tag, and verify the package
+with `luarocks lint lcanny-0.3.0-1.rockspec`.
