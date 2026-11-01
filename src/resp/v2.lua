@@ -19,6 +19,10 @@ local unpack = table.unpack or unpack
 -- @treturn ?string Receiving error, if any.
 function _M.calling(tcp)
   return hi.calling(function(...)
+    -- Send the command using the recursive sending function. Note: Redis
+    -- command arguments must be bulk strings. Normalise numeric arguments to
+    -- strings. Assume that the caller provides arguments in the correct order
+    -- and type.
     return _M.send.recursive(function(...)
       return tcp:send(...)
     end, ...)
