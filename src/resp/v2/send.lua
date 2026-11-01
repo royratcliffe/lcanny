@@ -12,7 +12,12 @@ function _M.recursive(sending, data)
   return assert(_M[type(data)])(sending, data)
 end
 
+--- Sends a RESP version-2 number.
+-- @tparam func sending Function for abstractly sending.
+-- @param data Number to send.
+-- @treturn number Number of bytes sent.
 function _M.number(sending, data)
+  -- Send the number as an integer for RESP version-2.
   return sending(table.concat { ":", data, "\r\n" })
 end
 
