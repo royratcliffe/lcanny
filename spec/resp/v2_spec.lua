@@ -222,4 +222,42 @@ describe("resp.v2", function()
     }, { entries() })
     assert.is_nil(entries())
   end)
+
+  if os.getenv("LCANNY_REDIS_INTEGRATION") == "1" then
+    describe("Redis integration", function()
+      local socket = require "socket.core"
+      local tcp = assert(socket.tcp())
+      assert(tcp:connect(os.getenv("REDISCLI_HOST") or "localhost", 6379))
+
+      local function send(...)
+        return resp.send.recursive(function(...)
+          return tcp:send(...)
+        end, ...)
+      end
+
+      local function recv()
+        return resp.recv.recursive(function(...)
+          return tcp:receive(...)
+        end)
+      end
+
+      teardown(function()
+        assert(tcp:close())
+      end)
+
+      it("runs LOLWUT and reports the Redis version", function()
+        assert.truthy(send { "LOLWUT" })
+        assert.matches("^Redis ver%. %d+%.%d+%.%d+\n$", recv())
+      end)
+
+      it("calls Redis commands through hi.calling", function()
+        local hi = require "hi"
+        local redis = {
+          call = hi.calling(send, recv)
+        }
+
+        assert.truthy(redis.call { "INFO" })
+      end)
+    end)
+  end
 end)

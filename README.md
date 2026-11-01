@@ -70,6 +70,11 @@ project root:
 busted
 ```
 
+The standard suite uses mocked Redis connections. To run the live Redis
+integration specs as well, start a Redis server, set
+`LCANNY_REDIS_INTEGRATION=1`, and optionally set `REDISCLI_HOST` to select its
+host.
+
 To collect a LuaCov coverage report, install LuaCov with
 `luarocks install luacov` and run:
 
