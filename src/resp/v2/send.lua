@@ -21,6 +21,10 @@ function _M.number(sending, data)
   return sending(table.concat { ":", data, "\r\n" })
 end
 
+--- Sends a RESP version-2 bulk string.
+-- @tparam func sending Function for abstractly sending.
+-- @param data String to send.
+-- @treturn number Number of bytes sent.
 function _M.string(sending, data)
   return sending(table.concat { "$", #data, "\r\n", data, "\r\n" })
 end
@@ -28,6 +32,9 @@ end
 --- Sends a RESP version-2 array.
 -- Tables are sent as arrays, ignoring indices. Assume that the hash operator
 -- delivers the correct number of indexed pairs.
+-- @tparam func sending Function for abstractly sending.
+-- @param data Table to send.
+-- @treturn number Number of bytes sent.
 function _M.table(sending, data)
   local sent = assert(sending(table.concat { "*", #data, "\r\n" }))
   for _, item in ipairs(data) do
