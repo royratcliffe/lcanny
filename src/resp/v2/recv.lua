@@ -57,8 +57,16 @@ _M["$"] = function(recving, rest)
   return data
 end
 
+--- Receives a RESP version-2 array.
+-- Receives an array of recursive items. The length of the array is specified
+-- by the first line after the `*` character. Each item is received recursively.
+-- A null array is represented by a negative length.
+-- @tparam func recving Function for abstractly receiving.
+-- @tparam string rest The rest of the first line after the `*` character.
+-- @treturn ?tab Array of received items; possibly RESP null.
 _M["*"] = function(recving, rest)
   local len = assert(tonumber(rest))
+  if len < 0 then return resp.null end
   local data = {}
   for _ = 1, len do
     table.insert(data, assert(_M.recursive(recving)))
