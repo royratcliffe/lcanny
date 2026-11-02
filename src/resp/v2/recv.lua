@@ -99,7 +99,13 @@ _M["*"] = function(recving, rest)
   if len < 0 then return resp.null end
   local data = {}
   for _ = 1, len do
-    table.insert(data, assert(_M.recursive(recving)))
+    -- Recursively receive each item in the array. Do not assert here;
+    -- let the recursive function handle errors. An array may legally
+    -- contain null items, e.g., `*2\r\n$-1\r\n$3\r\nfoo\r\n` following
+    -- the RESP specification---an array of two bulk strings, the first
+    -- being null and the second being "foo". EXEC results containing a
+    -- failed command will include an error item in the array.
+    table.insert(data, _M.recursive(recving))
   end
   return data
 end
