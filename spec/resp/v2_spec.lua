@@ -137,7 +137,7 @@ describe("resp.v2", function()
     local call, sending, receiving = resp.resuming(tcp)
 
     assert.equal(0, timeout)
-    assert.equal("OK", call({ "PING" }))
+    assert.equal("OK", call { "PING" })
     assert.equal(4, sending(1))
     assert.equal("OK", receiving())
     assert.same({ "*1\r\n", "$4\r\nPING\r\n", ":1\r\n" }, sent)
@@ -204,7 +204,7 @@ describe("resp.v2", function()
   end)
 
   it("iterates stream entries and collapses fields", function()
-    local entries = resp.entries({
+    local entries = resp.entries {
       {
         "stream",
         {
@@ -212,7 +212,7 @@ describe("resp.v2", function()
           { "2-0", { "name", "Lin" } }
         }
       }
-    })
+    }
 
     assert.same({
       "stream", "1-0", { name = "Ada", active = "yes" }
