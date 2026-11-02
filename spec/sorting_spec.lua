@@ -19,9 +19,9 @@ describe("sorting", function()
 
     assert.same({
       { 1, -3, "negative" },
-      { 2, 0, false },
-      { 3, 4, "four" },
-      { 4, 9, "nine" },
+      { 2, 0,  false },
+      { 3, 4,  "four" },
+      { 4, 9,  "nine" },
     }, entries(sorting.ipairs(indexed)))
   end)
 
@@ -51,8 +51,8 @@ describe("sorting", function()
     local indexed = { [2] = "two", ["10"] = "ten", [1] = "one" }
 
     assert.same({
-      { 1, 1, "one" },
-      { 2, 2, "two" },
+      { 1, 1,    "one" },
+      { 2, 2,    "two" },
       { 3, "10", "ten" },
     }, entries(sorting.ipairs(indexed, function(left, right)
       return tonumber(left) < tonumber(right)
@@ -64,7 +64,7 @@ describe("sorting", function()
 
     assert.same({
       { 1, false, "off" },
-      { 2, true, "on" },
+      { 2, true,  "on" },
     }, entries(sorting.ipairs(indexed, function(left, right)
       return left == false and right == true
     end)))
