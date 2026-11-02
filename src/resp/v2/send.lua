@@ -2,6 +2,7 @@
 -- Sends by Lua type: number, string or table. Numbers are sent as integers for
 -- version 2. Strings go out as bulk strings. Tables transmit by recursion as
 -- arrays of items which are themselves numbers, strings or sub-tables.
+-- @module resp.v2.send
 local _M = {}
 
 --- Sends a RESP version-2 message recursively.

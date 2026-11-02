@@ -7,6 +7,7 @@
 -- * a bulk string or a null; else
 -- * an array.
 --
+-- @module resp.v2.recv
 local _M = {}
 local resp = {
   null = require "resp.null"
