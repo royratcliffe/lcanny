@@ -113,6 +113,9 @@ ldoc --fatalwarnings --testing -c config.ld src
 
 The generated site is written to `doc`.
 
+On Windows, run **Tasks: Run Task** in VS Code and select the
+**LDoc documentation** task to generate the site using the LuaRocks environment.
+
 ## Publishing
 
 Before uploading a release, update the repository URL and homepage in the
