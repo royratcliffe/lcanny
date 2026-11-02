@@ -39,6 +39,8 @@ function _M.recursive(recving)
 end
 
 --- Receives a RESP version-2 number.
+-- Handles the `:` reply prefix.
+-- @function number_reply
 -- @tparam func recving Function for abstractly receiving; unused for this reply.
 -- @tparam string rest Text after the colon prefix.
 -- @treturn number Received number.
@@ -48,6 +50,8 @@ end
 
 --- Receives a RESP version-2 simple error.
 -- Returns the error message as the second result rather than raising an error.
+-- Handles the `-` reply prefix.
+-- @function error_reply
 -- @tparam func recving Function for abstractly receiving; unused for this reply.
 -- @tparam string rest Error message after the prefix.
 -- @treturn nil No reply value.
@@ -57,6 +61,8 @@ _M["-"] = function(_, rest)
 end
 
 --- Receives a RESP version-2 simple string.
+-- Handles the `+` reply prefix.
+-- @function simple_string_reply
 -- @tparam func recving Function for abstractly receiving; unused for this reply.
 -- @tparam string rest Text after the plus prefix.
 -- @treturn string Received string.
@@ -67,6 +73,8 @@ end
 --- Receives a RESP version-2 bulk string.
 -- Receives the number of bytes specified by the length prefix, followed by a
 -- line ending. A negative length represents RESP null.
+-- Handles the `$` reply prefix.
+-- @function bulk_string_reply
 -- @tparam func recving Function for abstractly receiving.
 -- @tparam string rest Text after the dollar prefix.
 -- @treturn any Received string, or RESP null.
@@ -82,6 +90,7 @@ end
 -- Receives an array of recursive items. The length of the array is specified
 -- by the first line after the `*` character. Each item is received recursively.
 -- A null array is represented by a negative length.
+-- @function array_reply
 -- @tparam func recving Function for abstractly receiving.
 -- @tparam string rest The rest of the first line after the `*` character.
 -- @treturn ?tab Array of received items; possibly RESP null.
