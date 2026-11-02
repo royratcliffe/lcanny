@@ -116,6 +116,13 @@ The generated site is written to `doc`.
 On Windows, run **Tasks: Run Task** in VS Code and select the
 **LDoc documentation** task to generate the site using the LuaRocks environment.
 
+### Publish API documentation with GitHub Pages
+
+The **API documentation** workflow builds the LDoc site and deploys it to
+GitHub Pages when changes are pushed to `master`. To enable publishing, set
+**Settings → Pages → Build and deployment → Source** to **GitHub Actions**.
+You can also run the workflow manually from the Actions tab.
+
 ## Publishing
 
 Before uploading a release, update the repository URL and homepage in the

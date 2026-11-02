@@ -1,0 +1,38 @@
+name: API documentation
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+      - uses: leafo/gh-actions-luarocks@v4
+      - name: Install LDoc
+        run: luarocks install ldoc
+      - name: Generate API documentation
+        run: ldoc --fatalwarnings --testing -c config.ld src
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: doc
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
