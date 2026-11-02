@@ -7,7 +7,7 @@ local _M = {}
 
 local function ordered(sorted, ordering)
   local index = sorted[1][ordering + 1]
-  return index and ordering + 1, index, sorted[2][index]
+  return index ~= nil and ordering + 1 or nil, index, sorted[2][index]
 end
 
 --- Iterates table entries in sorted key order.
