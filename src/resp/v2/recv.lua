@@ -1,4 +1,4 @@
--- RESP version-2 receiving.
+--- RESP version-2 receiving.
 -- Receives for version-2 RESP answers one of the following:
 --
 -- * a number,
