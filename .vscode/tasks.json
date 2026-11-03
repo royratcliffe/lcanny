@@ -15,6 +15,21 @@
             },
             "group": "test",
             "problemMatcher": []
+        },
+        {
+            "label": "LDoc documentation",
+            "type": "process",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-Command",
+                "$ErrorActionPreference = 'Stop'; $bins = luarocks path --lr-bin; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $luaPath = luarocks path --lr-path; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $luaCPath = luarocks path --lr-cpath; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; $env:Path = \"$bins;$env:Path\"; $env:LUA_PATH = \"src\\?.lua;$luaPath\"; $env:LUA_CPATH = $luaCPath; ldoc --fatalwarnings --testing -c config.ld src; exit $LASTEXITCODE"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "problemMatcher": []
         }
     ]
 }

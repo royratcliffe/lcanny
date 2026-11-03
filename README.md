@@ -8,30 +8,57 @@ serialisation, and string building.
 ## Modules
 
 - `by`: group values by a key function.
+- `co`: run coroutine lists with configurable error logging.
 - `collecting`: collect iterator values or key-value pairs into tables.
 - `div`: calculate quotients and modulo values.
+- `filename`: read and write files with automatic closure.
+- `filtering`: collect pairs that satisfy a filter.
+- `hi`: build half-duplex calling functions.
 - `indexing`: access values and create nested indices with defaults.
 - `interleaving`: iterate arrays as pairs of values.
 - `is`: check Lua identifiers and array tables.
 - `leap`: perform proleptic Gregorian calendar and leap-year calculations.
 - `patching`: diff tables and apply patches in place.
 - `recursing`: iterate table leaves and branches, or look up nested values.
+- `redis`: connect to Redis using RESP version 2.
+- `resp`: send and receive RESP version-2 messages and iterate Redis results.
 - `serialising`: serialise Lua values and tables as Lua source.
+- `so`: wrap socket operations with timeout callbacks.
 - `strbuf`: build strings using a callable buffer.
+- `uu`: generate time-, random-, and sequence-based identifiers.
 
 Each module is required by its name, for example `require("collecting")`.
+
+### Coroutine error logging
+
+The `co` module reports coroutine errors through `co.log(message)`, which
+writes to stderr by default. Replace the callback to use an application logger:
+
+```lua
+local co = require "co"
+co.log = function(message)
+  log.write("on", log.ERROR, message)
+end
+```
+
+The callback receives a string and applies to all coroutine lists, including
+existing ones. Logger failures propagate to the caller.
 
 ## Requirements
 
 - Lua 5.1 or newer
 - [LuaRocks](https://luarocks.org/)
+- [LuaSocket](https://lunarmodules.github.io/luasocket/) (installed by LuaRocks)
+
+Loading `redis` opens a connection to `REDISCLI_HOST` (default: `localhost`)
+on port 6379 and requires a running Redis server.
 
 ## Build and install locally
 
 From the project root, run:
 
 ```sh
-luarocks make lcanny-0.2.0-1.rockspec
+luarocks make lcanny-0.3.0-1.rockspec
 ```
 
 ## Run the Busted specs
@@ -43,6 +70,11 @@ project root:
 busted
 ```
 
+The standard suite uses mocked Redis connections. To run the live Redis
+integration specs as well, start a Redis server, set
+`LCANNY_REDIS_INTEGRATION=1`, and optionally set `REDISCLI_HOST` to select its
+host.
+
 To collect a LuaCov coverage report, install LuaCov with
 `luarocks install luacov` and run:
 
@@ -52,6 +84,7 @@ luacov
 ```
 
 The coverage workflow runs this on Lua 5.1 and 5.4 for pushes and pull requests.
+Codecov excludes the `spec/` directory from coverage metrics.
 
 ### Coverage in VS Code on Windows
 
@@ -80,8 +113,18 @@ ldoc --fatalwarnings --testing -c config.ld src
 
 The generated site is written to `doc`.
 
+On Windows, run **Tasks: Run Task** in VS Code and select the
+**LDoc documentation** task to generate the site using the LuaRocks environment.
+
+### Publish API documentation with GitHub Pages
+
+The **API documentation** workflow builds the LDoc site and deploys it to
+GitHub Pages when changes are pushed to `master`. To enable publishing, set
+**Settings → Pages → Build and deployment → Source** to **GitHub Actions**.
+You can also run the workflow manually from the Actions tab.
+
 ## Publishing
 
 Before uploading a release, update the repository URL and homepage in the
-rockspec, commit and push the matching `v0.2.0` Git tag, and verify the package
-with `luarocks lint lcanny-0.2.0-1.rockspec`.
+rockspec, commit and push the matching `v0.3.0` Git tag, and verify the package
+with `luarocks lint lcanny-0.3.0-1.rockspec`.

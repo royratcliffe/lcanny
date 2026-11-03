@@ -1,6 +1,8 @@
 describe("leap", function()
   local leap = require "leap"
   local monthdays = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+  -- The number of days in a 400-year Gregorian cycle.
+  local cycledays = 146097
 
   local function isleap(year)
     if year % 400 == 0 then return true end
@@ -17,6 +19,9 @@ describe("leap", function()
   end
 
   local function normalise(year, day)
+    local cycles = math.modf(day / cycledays)
+    year = year + cycles * 400
+    day = day - cycles * cycledays
     while day < 0 do
       year = year - 1
       day = day + daysinyear(year)
@@ -125,11 +130,19 @@ describe("leap", function()
         assert.equal(mday, leap.mday(year, month))
         assert.equal(yday, leap.yday(year, month))
         for day = 1, mday do
-          assert.same({ year, month, day }, { leap.date(year, yday) })
-          assert.same({ year, yday }, { leap.from(year, month, day) })
-          assert.same({ year, yday }, { leap.off(0, abs) })
-          assert.same({ year, month, day }, { leap.absdate(abs) })
-          assert.equal(abs, leap.absfrom(year, month, day))
+          local dateyear, datemonth, dateday = leap.date(year, yday)
+          local fromyear, fromday = leap.from(year, month, day)
+          local offyear, offday = leap.off(0, abs)
+          local absyear, absmonth, absday = leap.absdate(abs)
+          local absfrom = leap.absfrom(year, month, day)
+          if dateyear ~= year or datemonth ~= month or dateday ~= day
+            or fromyear ~= year or fromday ~= yday
+            or offyear ~= year or offday ~= yday
+            or absyear ~= year or absmonth ~= month or absday ~= day
+            or absfrom ~= abs then
+            error(string.format("calendar conversion mismatch at %d-%02d-%02d",
+              year, month, day), 0)
+          end
           yday, abs = yday + 1, abs + 1
         end
       end
@@ -163,11 +176,19 @@ describe("leap", function()
     for year = -400, 399 do
       local yday = daysinyear(year)
       local offs = {
-        -146098, -146097, -146096, -1000, -367, -366, -365, -1,
-        0, 1, yday - 1, yday, yday + 1,
-        1000, 146096, 146097, 146098,
+        -1000, -367, -366, -365, -1, 0, 1,
+        yday - 1, yday, yday + 1, 365, 366, 367, 1000,
       }
       for _, off in ipairs(offs) do
+        assert.same({ normalise(year, off) }, { leap.off(year, off) },
+          "year " .. year .. ", offset " .. off)
+      end
+    end
+  end)
+
+  it("normalises offsets spanning Gregorian cycles", function()
+    for _, year in ipairs({ -400, -100, -1, 0, 1, 100, 400 }) do
+      for _, off in ipairs({ -146098, -146097, -146096, 146096, 146097, 146098 }) do
         assert.same({ normalise(year, off) }, { leap.off(year, off) },
           "year " .. year .. ", offset " .. off)
       end
