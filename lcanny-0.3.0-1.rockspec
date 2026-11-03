@@ -23,6 +23,7 @@ build = {
       co = "src/co.lua",
       collecting = "src/collecting.lua",
       div = "src/div.lua",
+      escape = "src/escape.lua",
       filename = "src/filename.lua",
       filtering = "src/filtering.lua",
       hi = "src/hi.lua",
