@@ -12,8 +12,17 @@ local _M = {}
 -- @treturn table Environment used for the loaded chunk.
 function _M.dofile(filename, env)
   env = env or {}
-  local calling = loadfile(filename)
-  if calling then pcall(setfenv(calling, env)) end
+  local calling
+  if setfenv then
+    calling = loadfile(filename)
+    if calling then setfenv(calling, env) end
+  else
+    -- In Lua 5.2 and later, setfenv is not available, so pass the
+    -- environment directly to loadfile. Pass "t" as the mode to
+    -- indicate text-only mode.
+    calling = loadfile(filename, "t", env)
+  end
+  if calling then pcall(calling) end
   return env
 end
 
