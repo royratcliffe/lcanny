@@ -1,0 +1,21 @@
+--- Safe functions.
+-- @module safely
+local _M = {}
+
+--- Loads and calls Lua within an environment.
+-- Loads a chunk of Lua from the given file, then executes it within a
+-- function environment using a protected call. Creates a new empty environment if none provided.
+-- Ignores any errors that occur during loading or execution, and returns the
+-- environment used for the loaded chunk.
+-- @tparam string filename Name of file to load and execute.
+-- @tparam[opt] table env Environment to use for the loaded chunk.
+-- @treturn table Environment used for the loaded chunk.
+function _M.dofile(filename, env)
+  env = env or {}
+  ---@diagnostic disable-next-line: deprecated
+  local calling = loadfile(filename)
+  if calling then pcall(setfenv(calling, env)) end
+  return env
+end
+
+return _M
