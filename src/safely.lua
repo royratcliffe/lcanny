@@ -12,7 +12,6 @@ local _M = {}
 -- @treturn table Environment used for the loaded chunk.
 function _M.dofile(filename, env)
   env = env or {}
-  ---@diagnostic disable-next-line: deprecated
   local calling = loadfile(filename)
   if calling then pcall(setfenv(calling, env)) end
   return env
