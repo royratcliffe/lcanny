@@ -20,6 +20,9 @@ end
 
 --- Merges zero or more values into a path string, ensuring that each
 --- value is unique in the resulting path string.
+-- Note that empty strings are ignored and duplicates are removed. This
+-- means that trailing double semicolons will be removed. Append them to
+-- the result manually if needed.
 -- @tparam string path The original path string.
 -- @tparam {string,...} ... Zero or more values to append to the path string.
 -- @treturn string The resulting path string with unique values.
