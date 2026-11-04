@@ -1,10 +1,10 @@
 ---@diagnostic disable: lowercase-global
 
 package = "lcanny"
-version = "0.3.0-1"
+version = "0.4.0-1"
 source = {
    url = "git+https://github.com/royratcliffe/lcanny.git",
-   tag = "v0.3.0",
+   tag = "v0.4.0",
 }
 description = {
    summary = "Lua utility modules for tables, iteration, and serialisation",
@@ -34,6 +34,8 @@ build = {
       patching = "src/patching.lua",
       recursing = "src/recursing.lua",
       redis = "src/redis.lua",
+      safely = "src/safely.lua",
+      searchpath = "src/searchpath.lua",
       resp = "src/resp.lua",
       ["resp.null"] = "src/resp/null.lua",
       ["resp.v2"] = "src/resp/v2.lua",
@@ -41,6 +43,7 @@ build = {
       ["resp.v2.send"] = "src/resp/v2/send.lua",
       serialising = "src/serialising.lua",
       so = "src/so.lua",
+      sorting = "src/sorting.lua",
       strbuf = "src/strbuf.lua",
       uu = "src/uu.lua",
    },
