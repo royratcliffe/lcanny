@@ -6,14 +6,14 @@ local _M = {}
 
 ---- Closes a file after a protected operation.
 -- @tparam file file The file to close.
--- @tparam boolean ok Whether the operation succeeded.
+-- @tparam boolean status Whether the operation succeeded.
 -- @param ... Operation results or the error to rethrow.
 -- @return ... Operation results, or nil and a close error.
-local function close(file, ok, ...)
-  local closeok, closed, err = pcall(file.close, file)
+local function close(file, status, ...)
+  local ok, closed, err = pcall(file.close, file)
   -- Preserve the operation error even if closing also fails.
-  if not ok then error((...), 0) end
-  if not closeok then error(closed, 0) end
+  if not status then error((...), 0) end
+  if not ok then error(closed, 0) end
   -- Allow for some embedded versions of Lua where file:close() quietly succeeds
   -- without returning true.
   if not closed and err then return closed, err end
