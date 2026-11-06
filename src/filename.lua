@@ -14,7 +14,9 @@ local function close(file, ok, ...)
   -- Preserve the operation error even if closing also fails.
   if not ok then error((...), 0) end
   if not closeok then error(closed, 0) end
-  if not closed then return closed, err end
+  -- Allow for some embedded versions of Lua where file:close() quietly succeeds
+  -- without returning true.
+  if not closed and err then return closed, err end
   return ...
 end
 
