@@ -82,7 +82,7 @@ function _M.hscan(call, key, ...)
   -- fields and values by using an interleaving iterator.
   local hpairs = interleaving.ipairs
   for index = 1, select("#", ...) do
-    if select(index, ...) == "NOVALUES" then
+    if string.upper(select(index, ...)) == "NOVALUES" then
       hpairs = ipairs
       break
     end
