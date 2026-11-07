@@ -68,6 +68,11 @@ function _M.scan(call, ...)
   end)
 end
 
+--- Iterate over the fields of a hash using HSCAN.
+-- @tparam function call Redis call function.
+-- @tparam string key Hash key.
+-- @param ... Additional HSCAN arguments.
+-- @treturn function Iterator yielding fields.
 function _M.hscan(call, key, ...)
   local args = { ... }
   return coroutine.wrap(function()
@@ -82,6 +87,11 @@ function _M.hscan(call, key, ...)
   end)
 end
 
+--- Iterate over the members of a set using SSCAN.
+-- @tparam function call Redis call function.
+-- @tparam string key Set key.
+-- @param ... Additional SSCAN arguments.
+-- @treturn function Iterator yielding members.
 function _M.sscan(call, key, ...)
   local args = { ... }
   return coroutine.wrap(function()
