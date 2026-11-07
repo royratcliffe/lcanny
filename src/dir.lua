@@ -9,9 +9,6 @@ local lfs = require "lfs"
 --- Iterates non-dot directory entries.
 -- Iterates all entries in a directory except for the special dot (`.`) and
 -- double-dot (`..`) entries.
---
--- Automatically yields names as UTF-8 strings. They are converted from the
--- default system encoding.
 -- @param ... Directory components.
 -- @treturn func Non-dot directory entry iterator.
 function _M.nondot(...)
