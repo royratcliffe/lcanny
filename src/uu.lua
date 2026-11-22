@@ -5,10 +5,15 @@ local _M = {
   SEQ = 0
 }
 
+-- Seed the random number generator. This uses the current time and clock to
+-- generate a unique seed.
+-- Only do this once per process to avoid reseeding the PRNG multiple times.
 -- WARNING: os.time() has only second resolution. Processes loading this module
 -- in the same second can seed identical random sequences and generate duplicate
 -- identifiers. This also reseeds Lua's shared PRNG; uniqueness is not guaranteed.
-math.randomseed(os.time())
+if math.randomseed then
+  math.randomseed(os.time() + os.clock() * 100000)
+end
 
 --- Generates a new UUID.
 -- Uses the current time, a random number, and a sequence number to generate a

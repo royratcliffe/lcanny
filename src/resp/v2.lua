@@ -68,20 +68,43 @@ function _M.scan(call, ...)
   end)
 end
 
+--- Iterate over the fields of a hash using HSCAN.
+-- The iterator delivers the fields in values in the same order as the scan. It
+-- does *not* sort the fields. Redis does not guarantee non-duplication during
+-- the scan.
+-- @tparam function call Redis call function.
+-- @tparam string key Hash key.
+-- @param ... Additional HSCAN arguments.
+-- @treturn function Iterator yielding fields.
 function _M.hscan(call, key, ...)
+  -- Determine the appropriate iterator for the HSCAN results. If "NOVALUES" is
+  -- present in the arguments, only yield the field names; otherwise, yield both
+  -- fields and values by using an interleaving iterator.
+  local hpairs = interleaving.ipairs
+  for index = 1, select("#", ...) do
+    if string.upper(select(index, ...)) == "NOVALUES" then
+      hpairs = ipairs
+      break
+    end
+  end
   local args = { ... }
   return coroutine.wrap(function()
     local cursor = "0"
     repeat
       local fields
       cursor, fields = unpack(assert(call { "HSCAN", key, cursor, unpack(args) }))
-      for _, field in ipairs(fields) do
-        coroutine.yield(field)
+      for _, field, value in hpairs(fields) do
+        coroutine.yield(field, value)
       end
     until cursor == "0"
   end)
 end
 
+--- Iterate over the members of a set using SSCAN.
+-- @tparam function call Redis call function.
+-- @tparam string key Set key.
+-- @param ... Additional SSCAN arguments.
+-- @treturn function Iterator yielding members.
 function _M.sscan(call, key, ...)
   local args = { ... }
   return coroutine.wrap(function()

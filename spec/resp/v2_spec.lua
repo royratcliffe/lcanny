@@ -173,13 +173,13 @@ describe("resp.v2", function()
       table.insert(requests, request)
       return table.remove(pages, 1)
     end
-    local fields = resp.hscan(call, "hash", "COUNT", 3)
+    local fields = resp.hscan(call, "hash", "COUNT", 3, "NOVALUES")
 
     assert.same({ "a", "b", "c" }, { fields(), fields(), fields() })
     assert.is_nil(fields())
     assert.same({
-      { "HSCAN", "hash", "0", "COUNT", 3 },
-      { "HSCAN", "hash", "2", "COUNT", 3 }
+      { "HSCAN", "hash", "0", "COUNT", 3, "NOVALUES" },
+      { "HSCAN", "hash", "2", "COUNT", 3, "NOVALUES" }
     }, requests)
   end)
 
